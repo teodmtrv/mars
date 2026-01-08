@@ -1,15 +1,15 @@
-"use client";
+"use client"
 
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
-import { Button } from "@/components/ui/button";
-import { ExternalLink } from "lucide-react";
-import Link from "next/link";
-import { getFaviconUrl } from "@/lib/utils";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
+import { Button } from "@/components/ui/button"
+import { ExternalLink } from "lucide-react"
+import Link from "next/link"
+import { getFaviconUrl } from "@/lib/utils"
 
 interface CitationsCardProps {
-  citationNumber: number;
-  url: string;
-  title: string;
+  citationNumber: number
+  url: string
+  title: string
 }
 
 export function CitationsCard({ citationNumber, url, title }: CitationsCardProps) {
@@ -24,24 +24,18 @@ export function CitationsCard({ citationNumber, url, title }: CitationsCardProps
           {citationNumber}
         </Button>
       </HoverCardTrigger>
-      <HoverCardContent 
-        side="top" 
-        align="start" 
-        className="w-80 p-3"
-      >
+      <HoverCardContent side="top" align="start" className="w-80 p-3">
         <div className="space-y-2">
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium line-clamp-2 text-foreground">
-                {title}
-              </p>
+              <p className="text-sm font-medium line-clamp-2 text-foreground">{title}</p>
               <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-1">
                 <img
-                  src={getFaviconUrl(url) || ''}
+                  src={getFaviconUrl(url) || ""}
                   alt=""
                   className="size-3 flex-shrink-0"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
+                    ;(e.target as HTMLImageElement).style.display = "none"
                   }}
                 />
                 <Link
@@ -58,5 +52,5 @@ export function CitationsCard({ citationNumber, url, title }: CitationsCardProps
         </div>
       </HoverCardContent>
     </HoverCard>
-  );
+  )
 }

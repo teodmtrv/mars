@@ -3,11 +3,20 @@ export function LoadingDots() {
     <div className="flex w-full lg:w-1/2 p-2 justify-start">
       <div className="flex items-center space-x-2 text-muted-foreground">
         <div className="flex space-x-1">
-          <div className="size-2 bg-foreground rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-          <div className="size-2 bg-foreground rounded-full animate-bounce" style={{ animationDelay: '100ms' }}></div>
-          <div className="size-2 bg-foreground rounded-full animate-bounce" style={{ animationDelay: '200ms' }}></div>
+          <div
+            className="size-2 bg-foreground rounded-full animate-bounce"
+            style={{ animationDelay: "0ms" }}
+          ></div>
+          <div
+            className="size-2 bg-foreground rounded-full animate-bounce"
+            style={{ animationDelay: "100ms" }}
+          ></div>
+          <div
+            className="size-2 bg-foreground rounded-full animate-bounce"
+            style={{ animationDelay: "200ms" }}
+          ></div>
         </div>
       </div>
     </div>
-  );
-} 
+  )
+}

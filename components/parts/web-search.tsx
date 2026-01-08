@@ -1,56 +1,61 @@
-'use client';
+"use client"
 
-import { Card, CardContent } from '@/components/ui/card';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Globe, Link } from 'lucide-react';
-import React from 'react';
-import { getFaviconUrl } from '@/lib/utils';
-import { SearchResult } from 'exa-js';
+import { Card, CardContent } from "@/components/ui/card"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from "@/components/ui/accordion"
+import { Globe, Link } from "lucide-react"
+import React from "react"
+import { getFaviconUrl } from "@/lib/utils"
+import { SearchResult } from "exa-js"
 
 interface WebSearchProps {
-  query: string;
-  results: SearchResult<{}>[];
-  subAgentId: string;
-  searchIndex: number;
+  query: string
+  results: SearchResult<{}>[]
+  subAgentId: string
+  searchIndex: number
 }
 
 export function WebSearch({ query, results, subAgentId, searchIndex }: WebSearchProps) {
   const renderSearchResult = (result: SearchResult<{}>, index: number) => {
-    const faviconUrl = getFaviconUrl(result.url);
-    
+    const faviconUrl = getFaviconUrl(result.url)
+
     return (
       <Card key={index} className="hover:bg-secondary/20 transition-colors p-0 mx-2">
         <CardContent className="px-4 py-3">
           <div className="flex items-center gap-2">
             <div className="size-4 flex items-center justify-center flex-shrink-0">
               {faviconUrl && (
-                <img 
-                  src={faviconUrl} 
-                  alt="favicon" 
-                  className="size-4" 
+                <img
+                  src={faviconUrl}
+                  alt="favicon"
+                  className="size-4"
                   onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                    e.currentTarget.style.display = "none"
+                    const nextElement = e.currentTarget.nextElementSibling as HTMLElement
                     if (nextElement) {
-                      nextElement.style.display = 'block';
+                      nextElement.style.display = "block"
                     }
                   }}
                 />
               )}
-              <Link 
+              <Link
                 className="size-4 text-muted-foreground"
-                style={{ display: faviconUrl ? 'none' : 'block' }}
+                style={{ display: faviconUrl ? "none" : "block" }}
               />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <a 
-                  href={result.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
+                <a
+                  href={result.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-xs text-card-foreground hover:no-underline truncate flex-1"
                 >
-                  {result.title || 'Untitled'}
+                  {result.title || "Untitled"}
                 </a>
                 <span className="text-xs text-muted-foreground flex-shrink-0">
                   {new URL(result.url).hostname}
@@ -65,11 +70,11 @@ export function WebSearch({ query, results, subAgentId, searchIndex }: WebSearch
           </div>
         </CardContent>
       </Card>
-    );
-  };
+    )
+  }
 
-  const searchKey = `${subAgentId}-search-${searchIndex}`;
-  
+  const searchKey = `${subAgentId}-search-${searchIndex}`
+
   return (
     <Card className="p-0">
       <Accordion type="single" collapsible>
@@ -78,13 +83,11 @@ export function WebSearch({ query, results, subAgentId, searchIndex }: WebSearch
             <div className="flex items-center gap-3 w-full min-w-0">
               <Globe className="size-4 text-muted-foreground flex-shrink-0" />
               <div className="flex-1 text-left min-w-0">
-                <span className="text-sm break-words">{query || 'Unknown query'}</span>
+                <span className="text-sm break-words">{query || "Unknown query"}</span>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
                 {results && results.length > 0 && (
-                  <span className="text-xs text-muted-foreground">
-                    {results.length} results
-                  </span>
+                  <span className="text-xs text-muted-foreground">{results.length} results</span>
                 )}
               </div>
             </div>
@@ -93,7 +96,9 @@ export function WebSearch({ query, results, subAgentId, searchIndex }: WebSearch
             <AccordionContent>
               <div className="px-0">
                 <div className="space-y-2">
-                  {results.map((result: SearchResult<{}>, index: number) => renderSearchResult(result, index))}
+                  {results.map((result: SearchResult<{}>, index: number) =>
+                    renderSearchResult(result, index)
+                  )}
                 </div>
               </div>
             </AccordionContent>
@@ -101,5 +106,5 @@ export function WebSearch({ query, results, subAgentId, searchIndex }: WebSearch
         </AccordionItem>
       </Accordion>
     </Card>
-  );
+  )
 }

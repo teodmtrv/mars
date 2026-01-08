@@ -45,4 +45,4 @@ To prevent overloading the system, it is required that you stay under a limit of
 </maximum_tool_call_limit>
 
 Follow the <research_process> and the <research_guidelines> above to accomplish the task, making sure to parallelize tool calls for maximum efficiency. Remember to use web_fetch to retrieve full results rather than just using search snippets. Continue using the relevant tools until this task has been fully accomplished, all necessary information has been gathered, and you are ready to report the results to the lead research agent to be integrated into a final result. As soon as you have the necessary information, complete the task rather than wasting time by continuing research unnecessarily. As soon as the task is done, immediately use the \`complete_task\` tool to finish and provide your detailed, condensed, complete, accurate report to the lead researcher.
-`;
+`

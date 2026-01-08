@@ -1,33 +1,40 @@
-'use client';
+"use client"
 
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Send, Square } from 'lucide-react';
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Send, Square } from "lucide-react"
 
 interface InputBoxProps {
-  input: string;
-  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-  onChange: (value: string) => void;
-  inputRef?: React.RefObject<HTMLInputElement | null>;
-  status: 'submitted' | 'streaming' | 'ready' | 'error';
-  onStop: () => void;
+  input: string
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void
+  onChange: (value: string) => void
+  inputRef?: React.RefObject<HTMLInputElement | null>
+  status: "submitted" | "streaming" | "ready" | "error"
+  onStop: () => void
 }
 
-export function InputBox({ input, handleSubmit, onChange, inputRef, status, onStop }: InputBoxProps) {
-  const isProcessing = status === 'submitted' || status === 'streaming';
+export function InputBox({
+  input,
+  handleSubmit,
+  onChange,
+  inputRef,
+  status,
+  onStop
+}: InputBoxProps) {
+  const isProcessing = status === "submitted" || status === "streaming"
 
   const handleButtonClick = (e: React.MouseEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (isProcessing) {
-      onStop();
+      onStop()
     } else {
       // Trigger form submit for sending message
-      const form = e.currentTarget.closest('form');
+      const form = e.currentTarget.closest("form")
       if (form) {
-        form.requestSubmit();
+        form.requestSubmit()
       }
     }
-  };
+  }
 
   return (
     <form onSubmit={handleSubmit} className="relative flex flex-col items-center w-full">
@@ -41,18 +48,14 @@ export function InputBox({ input, handleSubmit, onChange, inputRef, status, onSt
       />
       <Button
         type={isProcessing ? "button" : "submit"}
-        size='icon'
+        size="icon"
         onClick={isProcessing ? handleButtonClick : undefined}
         className="absolute right-1.5 top-1/2 -translate-y-1/2 size-8 hover:bg-muted"
-        variant='ghost'
+        variant="ghost"
         aria-label={isProcessing ? "Stop generation" : "Send message"}
       >
-        {isProcessing ? (
-          <Square className="size-4" />
-        ) : (
-          <Send className="size-4" />
-        )}
+        {isProcessing ? <Square className="size-4" /> : <Send className="size-4" />}
       </Button>
     </form>
-  );
+  )
 }

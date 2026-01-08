@@ -6,11 +6,11 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const getFaviconUrl = (url: string) => {
-  if (!url) return null;
+  if (!url) return null
   try {
-    const domain = new URL(url).hostname;
-    return `https://www.google.com/s2/favicons?sz=16&domain=${domain}`;
+    const domain = new URL(url).hostname
+    return `https://www.google.com/s2/favicons?sz=16&domain=${domain}`
   } catch {
-    return null;
+    return null
   }
-};
+}

@@ -1,39 +1,39 @@
-'use client';
+"use client"
 
-import { useChat } from '@ai-sdk/react';
-import { InputBox } from './input-box';
-import { useEffect, useRef, useState } from "react";
-import { DefaultChatTransport } from 'ai';
-import { Messages } from './messages';
-import { StickToBottom, useStickToBottomContext } from 'use-stick-to-bottom';
-import { MyUIMessage } from '@/ai/types';
-import { Button } from '@/components/ui/button';
-import { RotateCcw, Square } from 'lucide-react';
+import { useChat } from "@ai-sdk/react"
+import { InputBox } from "./input-box"
+import { useEffect, useRef, useState } from "react"
+import { DefaultChatTransport } from "ai"
+import { Messages } from "./messages"
+import { StickToBottom, useStickToBottomContext } from "use-stick-to-bottom"
+import { MyUIMessage } from "@/ai/types"
+import { Button } from "@/components/ui/button"
+import { RotateCcw, Square } from "lucide-react"
 
 export function Chat() {
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("")
   const { messages, sendMessage, status, stop, setMessages } = useChat<MyUIMessage>({
-    transport: new DefaultChatTransport({ api: '/api/chat' }),
-  });
+    transport: new DefaultChatTransport({ api: "/api/chat" })
+  })
 
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
+    inputRef.current?.focus()
+  }, [])
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    sendMessage({ text: input });
-    setInput('');
-  };
+    e.preventDefault()
+    sendMessage({ text: input })
+    setInput("")
+  }
 
   const handleReset = () => {
-    setMessages([]);
-    setInput('');
-  };
+    setMessages([])
+    setInput("")
+  }
 
-  const isProcessing = status === 'submitted' || status === 'streaming';
+  const isProcessing = status === "submitted" || status === "streaming"
 
   // When no messages, show centered layout
   if (messages.length === 0) {
@@ -53,45 +53,31 @@ export function Chat() {
           />
         </div>
       </div>
-    );
+    )
   }
 
   // When messages exist, show normal layout
   return (
     <>
       {/* Messages area - will take flex-1 in parent */}
-      <StickToBottom 
-        className="flex-1 w-full min-h-0 relative"
-        resize="smooth"
-        initial="smooth"
-      >
+      <StickToBottom className="flex-1 w-full min-h-0 relative" resize="smooth" initial="smooth">
         <StickToBottom.Content className="flex flex-col items-center px-4">
           <Messages messages={messages} status={status} />
         </StickToBottom.Content>
-        
+
         <ScrollToBottomButton />
       </StickToBottom>
-      
+
       {/* Action buttons - fixed at bottom */}
       <div className="flex-shrink-0 flex justify-center w-full pb-6 bg-background">
         <div className="flex gap-3">
           {isProcessing ? (
-            <Button
-              onClick={stop}
-              variant="outline"
-              size="lg"
-              className="min-w-32"
-            >
+            <Button onClick={stop} variant="outline" size="lg" className="min-w-32">
               <Square className="mr-2 size-4" />
               Stop
             </Button>
           ) : (
-            <Button
-              onClick={handleReset}
-              variant="default"
-              size="lg"
-              className="min-w-32"
-            >
+            <Button onClick={handleReset} variant="default" size="lg" className="min-w-32">
               <RotateCcw className="mr-2 size-4" />
               Start Over
             </Button>
@@ -99,13 +85,13 @@ export function Chat() {
         </div>
       </div>
     </>
-  );
+  )
 }
 
 function ScrollToBottomButton() {
-  const { isAtBottom, scrollToBottom } = useStickToBottomContext();
+  const { isAtBottom, scrollToBottom } = useStickToBottomContext()
 
-  if (isAtBottom) return null;
+  if (isAtBottom) return null
 
   return (
     <Button
@@ -128,5 +114,5 @@ function ScrollToBottomButton() {
         <path d="m18 15-6 6-6-6" />
       </svg>
     </Button>
-  );
-} 
+  )
+}

@@ -29,4 +29,4 @@ Based on the provided document, add citations to the input text using the HTML c
 - ONLY add the citation tags to the text within <synthesized_text> tags
 - Output the final report directly without any XML tags
 - Text without citations will be collected and compared to the original report from the <synthesized_text>. If the text is not identical, your result will be rejected.
-`;
+`

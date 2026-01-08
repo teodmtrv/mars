@@ -1,7 +1,7 @@
-import { smoothStream, streamText, UIMessageStreamWriter } from 'ai';
-import { CITATIONS_AGENT_PROMPT } from './prompt';
-import { MODEL_CONFIG } from '../config';
-import { Source, MyUIMessage } from '../types';
+import { smoothStream, streamText, UIMessageStreamWriter } from "ai"
+import { CITATIONS_AGENT_PROMPT } from "./prompt"
+import { MODEL_CONFIG } from "../config"
+import { Source, MyUIMessage } from "../types"
 
 export async function runCitationsAgent(
   sources: Source[],
@@ -9,25 +9,25 @@ export async function runCitationsAgent(
   writer: UIMessageStreamWriter<MyUIMessage>,
   abortSignal?: AbortSignal
 ): Promise<void> {
-  console.log(`Total sources collected during research: ${sources.length}`);
-  
+  console.log(`Total sources collected during research: ${sources.length}`)
+
   if (!report) {
-    console.error('No report provided to citations agent');
-    return;
+    console.error("No report provided to citations agent")
+    return
   }
 
   // Adding citations phase
   writer.write({
-    type: 'data-report',
+    type: "data-report",
     data: {
-      phase: 'citations',
-      report: '',
-      sources: sources.map(({ url, title }) => ({ url, title })),
+      phase: "citations",
+      report: "",
+      sources: sources.map(({ url, title }) => ({ url, title }))
     },
-    id: 'data-report',
-  });
+    id: "data-report"
+  })
 
-  console.log('Adding citations...');
+  console.log("Adding citations...")
   // Generate complete report with citations
   const citationsResult = await streamText({
     model: MODEL_CONFIG.CITATIONS.model,
@@ -39,46 +39,47 @@ export async function runCitationsAgent(
     </synthesized_text>
 
     <sources>
-    ${sources.map((source, index) => 
-      `[${index + 1}] ${source.title ? source.title + ' - ' : ''}${source.url}\n${source.content}`
-    ).join('\n\n---\n\n')}
+    ${sources
+      .map(
+        (source, index) =>
+          `[${index + 1}] ${source.title ? source.title + " - " : ""}${source.url}\n${source.content}`
+      )
+      .join("\n\n---\n\n")}
     </sources>
     `,
     abortSignal,
     temperature: MODEL_CONFIG.TEMPERATURE,
     maxOutputTokens: MODEL_CONFIG.MAX_OUTPUT_TOKENS,
     providerOptions: MODEL_CONFIG.CITATIONS.providerOptions,
-    experimental_transform: [
-      smoothStream({ chunking: /.{1}/g }),
-    ],
+    experimental_transform: [smoothStream({ chunking: /.{1}/g })],
     onError(error) {
-      console.error(error);
-    },
-  });
+      console.error(error)
+    }
+  })
 
-  let reportWithCitations = '';
+  let reportWithCitations = ""
 
   for await (const part of citationsResult.fullStream) {
-    if (part.type === 'text-delta') {
+    if (part.type === "text-delta") {
       writer.write({
-        type: 'data-report',
+        type: "data-report",
         data: {
-          phase: 'citations',
-          report: reportWithCitations += part.text,
-          sources: sources.map(({ url, title }) => ({ url, title })),
+          phase: "citations",
+          report: (reportWithCitations += part.text),
+          sources: sources.map(({ url, title }) => ({ url, title }))
         },
-        id: 'data-report',
-      });
+        id: "data-report"
+      })
     }
   }
 
   writer.write({
-    type: 'data-report',
+    type: "data-report",
     data: {
-      phase: 'finished',
+      phase: "finished",
       report: reportWithCitations,
-      sources: sources.map(({ url, title }) => ({ url, title })),
+      sources: sources.map(({ url, title }) => ({ url, title }))
     },
-    id: 'data-report',
-  });
-} 
+    id: "data-report"
+  })
+}
