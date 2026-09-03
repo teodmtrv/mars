@@ -1,19 +1,25 @@
 import { tool } from "ai"
-import { z } from "zod"
 import Exa from "exa-js"
+import { z } from "zod"
 import { SEARCH_CONFIG } from "./config"
 
 const exa = new Exa(process.env.EXA_API_KEY)
 
-export const webSearchTool = tool({
-  description:
-    "Search the web for information. Use this to for information about recent events or information not in your knowledge base.",
+const searchResultSchema = z.object({
+  title: z.string().nullable(),
+  url: z.string(),
+  publishedDate: z.string().nullable(),
+  highlights: z.array(z.string())
+})
+
+export const searchWebTool = tool({
+  description: "Search the live web with Exa and return relevant page highlights.",
   inputSchema: z.object({
-    query: z.string().describe("The search query to use.")
+    query: z.string().describe("A concise web search query.")
   }),
   outputSchema: z.object({
     message: z.string(),
-    results: z.array(z.any()).nullable()
+    results: z.array(searchResultSchema)
   }),
   execute: async ({ query }) => {
     try {
@@ -21,28 +27,34 @@ export const webSearchTool = tool({
 
       const response = await exa.search(query, {
         numResults: SEARCH_CONFIG.MAX_SEARCH_RESULTS,
-        type: "keyword",
-        useAutoprompt: true
-        // startPublishedDate: '2025-01-01',
-        // endPublishedDate '2025-07-28',
-        // category: 'news',
+        type: "auto",
+        contents: {
+          highlights: { maxCharacters: 1000 },
+          maxAgeHours: 24
+        }
       })
 
-      const searchResults = response.results || []
+      const results = response.results.map((result) => ({
+        title: result.title ?? null,
+        url: result.url,
+        publishedDate: result.publishedDate ?? null,
+        highlights: result.highlights ?? []
+      }))
 
-      if (searchResults.length === 0) {
-        return { message: "No search results found.", results: null }
+      return {
+        message: results.length
+          ? `Found ${results.length} search results.`
+          : "No search results found.",
+        results
       }
-
-      return { message: `Found ${searchResults.length} search results.`, results: searchResults }
     } catch (error) {
       console.error("Error executing search tool:", error)
-      return { message: "An error occurred while searching the web.", results: null }
+      return { message: "An error occurred while searching the web.", results: [] }
     }
   }
 })
 
-export const webFetchTool = tool({
+export const fetchWebTool = tool({
   description: "Fetch a URL to get its content.",
   inputSchema: z.object({
     url: z.string().describe("The URL to fetch.")
@@ -54,7 +66,10 @@ export const webFetchTool = tool({
   }),
   execute: async ({ url }) => {
     try {
-      const response = await exa.getContents([url], { text: true, livecrawl: "preferred" })
+      const response = await exa.getContents([url], {
+        text: { maxCharacters: 10000 },
+        maxAgeHours: 24
+      })
 
       let content: string | null = null
       let title: string | null = null

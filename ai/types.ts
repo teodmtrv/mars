@@ -1,9 +1,9 @@
-import { webSearchTool, webFetchTool, createPlanTool, completeTaskTool } from "./tools"
-import { InferToolOutput, InferToolInput, InferUITools, UIMessage } from "ai"
+import { InferToolInput, InferToolOutput, InferUITools, UIMessage } from "ai"
+import { completeTaskTool, createPlanTool, fetchWebTool, searchWebTool } from "./tools"
 
 const tools = {
-  web_search: webSearchTool,
-  web_fetch: webFetchTool,
+  search_web: searchWebTool,
+  fetch_web: fetchWebTool,
   create_plan: createPlanTool,
   complete_task: completeTaskTool
 }
@@ -17,17 +17,17 @@ export interface Source {
 }
 
 export type WebSearchToolResult = {
-  toolName: "web_search"
+  toolName: "search_web"
   toolCallId: string
-  input: InferToolInput<typeof webSearchTool>
-  output: InferToolOutput<typeof webSearchTool>
+  input: InferToolInput<typeof searchWebTool>
+  output: InferToolOutput<typeof searchWebTool>
 }
 
 export type WebFetchToolResult = {
-  toolName: "web_fetch"
+  toolName: "fetch_web"
   toolCallId: string
-  input: InferToolInput<typeof webFetchTool>
-  output: InferToolOutput<typeof webFetchTool>
+  input: InferToolInput<typeof fetchWebTool>
+  output: InferToolOutput<typeof fetchWebTool>
 }
 
 export type SubAgentToolCall = WebSearchToolResult | WebFetchToolResult

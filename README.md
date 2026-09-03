@@ -14,7 +14,7 @@ An open-source implementation of a multi-agent research system inspired by [Clau
 - **Framework**: [Next.js 15](https://nextjs.org/) with App Router
 - **UI Components**: [ShadCN UI](https://ui.shadcn.com/) for modern UI Components powered by [Tailwind CSS](https://tailwindcss.com) with Claude theme from [TweakCN](https://https://tweakcn.com/)
 - **Runtime**: [Bun](https://bun.sh/) for fast JavaScript runtime
-- **AI Integration**: [Vercel AI SDK 5](https://sdk.vercel.ai/) for OpenRouter LLMs integration and streaming via custom data parts
+- **AI Integration**: [Vercel AI SDK 7](https://sdk.vercel.ai/) with AI Gateway and streaming via custom data parts
 - **Web Search**: [Exa AI](https://exa.ai/) for intelligent web search capabilities
 
 ## 🏗️ Architecture
@@ -31,7 +31,7 @@ This project implements the orchestrator-worker pattern described in Anthropic's
 ### Prerequisites
 
 - [Bun](https://bun.sh/) installed on your system
-- OpenRouter API key
+- Vercel AI Gateway API key
 - Exa AI API key
 
 ### Installation
@@ -54,7 +54,7 @@ cp .env.example .env.local
 
 Add your API keys to `.env.local`:
 ```env
-OPENROUTER_API_KEY=your_openrouter_api_key
+AI_GATEWAY_API_KEY=your_ai_gateway_api_key
 EXA_API_KEY=your_exa_api_key
 ```
 
@@ -75,7 +75,7 @@ bun dev
 
 ## 📝 Notes
 
-This project serves as a great reference implementation for several advanced AI agent patterns using AI SDK 5:
+This project serves as a great reference implementation for several advanced AI agent patterns using AI SDK 7:
 
 - **Parallel Agent UI Updates**: Real-time streaming updates for multiple agents working simultaneously, with individual progress tracking and state management
 - **Custom Citation Streaming**: Inline citation markers that are streamed in real-time and rendered directly in the UI as they're generated

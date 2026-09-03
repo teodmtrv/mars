@@ -1,24 +1,28 @@
 import {
-  tool,
-  streamText,
-  UIMessageStreamWriter,
-  stepCountIs,
   hasToolCall,
+  InferToolInput,
   smoothStream,
-  InferToolInput
+  stepCountIs,
+  streamText,
+  tool,
+  UIMessageStreamWriter
 } from "ai"
 import { z } from "zod"
-import { webSearchTool, webFetchTool, completeTaskTool } from "../tools"
+import { AGENT_CONFIG, MODEL_CONFIG } from "../config"
+import { completeTaskTool, fetchWebTool, searchWebTool } from "../tools"
+import { MyUIMessage, Source, SubAgentToolCall } from "../types"
 import { SUB_AGENT_PROMPT } from "./prompt"
-import { MODEL_CONFIG, AGENT_CONFIG } from "../config"
-import { Source, MyUIMessage, SubAgentToolCall } from "../types"
 
 export const runSubAgentTool = (writer: UIMessageStreamWriter<MyUIMessage>) =>
   tool({
     description:
       "Spawn a subagent to research a subtopic. Use this to research a subtopic in depth with specific instructions.",
     inputSchema: z.object({
-      taskName: z.string().describe("The subtopic to research."),
+      taskName: z
+        .string()
+        .describe(
+          'A short human-readable display name in title case, such as "UFC Event Schedule". Never use snake_case, kebab-case, or identifier-style names.'
+        ),
       taskInstructions: z
         .string()
         .describe(
@@ -41,7 +45,7 @@ export const runSubAgentTool = (writer: UIMessageStreamWriter<MyUIMessage>) =>
       console.log(`Running subagent with taskName: "${taskName}"`)
       console.log(`Instructions: "${taskInstructions}"`)
 
-      let sources: Source[] = []
+      const sources = new Map<string, Source>()
 
       writer.write({
         type: "data-subagent",
@@ -55,23 +59,27 @@ export const runSubAgentTool = (writer: UIMessageStreamWriter<MyUIMessage>) =>
 
       try {
         const subagentResult = await streamText({
-          model: MODEL_CONFIG.SUB_AGENT.model,
+          model: MODEL_CONFIG.MODEL,
           system: SUB_AGENT_PROMPT,
           prompt: `Research the following task: ${taskName}
 
         HERE ARE THE TASK INSTRUCTIONS FROM LEAD AGENT:
         ${taskInstructions}`,
           tools: {
-            web_search: webSearchTool,
-            web_fetch: webFetchTool,
+            search_web: searchWebTool,
+            fetch_web: fetchWebTool,
             complete_task: completeTaskTool
           },
           abortSignal,
-          temperature: MODEL_CONFIG.TEMPERATURE,
           maxOutputTokens: MODEL_CONFIG.MAX_OUTPUT_TOKENS,
-          providerOptions: MODEL_CONFIG.SUB_AGENT.providerOptions,
+          reasoning: MODEL_CONFIG.REASONING,
           stopWhen: [stepCountIs(AGENT_CONFIG.SUB_AGENT_MAX_STEPS), hasToolCall("complete_task")],
           prepareStep: async ({ stepNumber }) => {
+            if (stepNumber === 0) {
+              return {
+                toolChoice: { type: "tool", toolName: "search_web" }
+              }
+            }
             if (stepNumber === AGENT_CONFIG.SUB_AGENT_MAX_STEPS - 1) {
               return {
                 toolChoice: { type: "tool", toolName: "complete_task" }
@@ -90,13 +98,21 @@ export const runSubAgentTool = (writer: UIMessageStreamWriter<MyUIMessage>) =>
           if (part.type === "tool-result") {
             const { toolCallId, toolName, input, output } = part as SubAgentToolCall
 
-            if (toolName === "web_search") {
-              toolCalls.push({ toolCallId, toolName, input, output })
-            } else if (toolName === "web_fetch") {
+            if (toolName === "search_web") {
               toolCalls.push({ toolCallId, toolName, input, output })
 
-              if (output && output.content) {
-                sources.push({
+              for (const result of output.results) {
+                sources.set(result.url, {
+                  url: result.url,
+                  title: result.title || undefined,
+                  content: result.highlights.join("\n") || undefined
+                })
+              }
+            } else if (toolName === "fetch_web") {
+              toolCalls.push({ toolCallId, toolName, input, output })
+
+              if (output.content) {
+                sources.set(input.url, {
                   url: input.url,
                   content: output.content,
                   title: output.title || undefined
@@ -119,7 +135,7 @@ export const runSubAgentTool = (writer: UIMessageStreamWriter<MyUIMessage>) =>
             writer.write({
               type: "data-subagent",
               data: {
-                title: input.title,
+                title: taskName,
                 state: "done",
                 toolCalls: [...toolCalls]
               },
@@ -134,11 +150,11 @@ export const runSubAgentTool = (writer: UIMessageStreamWriter<MyUIMessage>) =>
         if (completionCall?.input) {
           console.log("Subagent research completed and report generated.")
           const finalReport = (completionCall.input as { report: string }).report
-          console.log(`Subagent collected ${sources.length} sources`)
+          console.log(`Subagent collected ${sources.size} sources`)
 
           return {
             report: finalReport,
-            sources: sources
+            sources: [...sources.values()]
           }
         }
 
@@ -146,14 +162,14 @@ export const runSubAgentTool = (writer: UIMessageStreamWriter<MyUIMessage>) =>
 
         return {
           report: `The sub-agent completed its research on "${taskName}" but did not generate a final report.`,
-          sources: sources
+          sources: [...sources.values()]
         }
       } catch (error) {
         console.error("Error in subagent execution:", error)
 
         return {
           report: `An error occurred while researching "${taskName}". Please try again.`,
-          sources: sources
+          sources: [...sources.values()]
         }
       }
     }

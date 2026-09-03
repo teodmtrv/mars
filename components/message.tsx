@@ -1,12 +1,12 @@
 "use client"
 
+import { MyUIMessage } from "@/ai/types"
 import { cn } from "@/lib/utils"
-import { SubAgent } from "./parts/sub-agent"
-import { Reasoning } from "./parts/reasoning"
 import { CreatePlan } from "./parts/create-plan"
 import { FinalReport } from "./parts/final-report"
+import { Reasoning } from "./parts/reasoning"
+import { SubAgent } from "./parts/sub-agent"
 import { Text } from "./parts/text"
-import { MyUIMessage } from "@/ai/types"
 
 interface MessageProps {
   message: MyUIMessage
@@ -25,6 +25,7 @@ export function Message({ message, status }: MessageProps) {
             case "text":
               return <Text key={key} text={part.text} />
             case "reasoning":
+              if (!part.text) return null
               return (
                 <Reasoning
                   key={key}

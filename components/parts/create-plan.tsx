@@ -1,15 +1,22 @@
-import { Card, CardContent } from "@/components/ui/card"
+import { Bot, Clock, FileText } from "lucide-react"
+import { Streamdown } from "streamdown"
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger
 } from "@/components/ui/accordion"
-import { Streamdown } from "streamdown"
-import { Bot, Clock, FileText } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
 
 interface CreatePlanProps {
-  state: "input-streaming" | "input-available" | "output-available" | "output-error"
+  state:
+    | "input-streaming"
+    | "input-available"
+    | "approval-requested"
+    | "approval-responded"
+    | "output-available"
+    | "output-error"
+    | "output-denied"
   plan?: string
   errorText?: string
 }

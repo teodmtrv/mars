@@ -1,18 +1,18 @@
 import {
-  streamText,
   convertToModelMessages,
-  UIMessageStreamWriter,
-  stepCountIs,
   hasToolCall,
-  smoothStream,
+  InferToolInput,
   InferToolOutput,
-  InferToolInput
+  smoothStream,
+  stepCountIs,
+  streamText,
+  UIMessageStreamWriter
 } from "ai"
-import { completeTaskTool, createPlanTool } from "../tools"
+import { AGENT_CONFIG, MODEL_CONFIG } from "../config"
 import { runSubAgentTool } from "../sub-agent/agent"
+import { completeTaskTool, createPlanTool } from "../tools"
+import { MyUIMessage, Source } from "../types"
 import { LEAD_AGENT_PROMPT } from "./prompt"
-import { MODEL_CONFIG, AGENT_CONFIG } from "../config"
-import { Source, MyUIMessage } from "../types"
 
 export async function runResearchAgent(
   messages: MyUIMessage[],
@@ -28,14 +28,13 @@ export async function runResearchAgent(
   }
 
   const leadAgentResult = await streamText({
-    model: MODEL_CONFIG.LEAD_AGENT.model,
+    model: MODEL_CONFIG.MODEL,
     system: LEAD_AGENT_PROMPT,
-    messages: convertToModelMessages(messages),
+    messages: await convertToModelMessages(messages),
     tools,
     abortSignal,
-    temperature: MODEL_CONFIG.TEMPERATURE,
     maxOutputTokens: MODEL_CONFIG.MAX_OUTPUT_TOKENS,
-    providerOptions: MODEL_CONFIG.LEAD_AGENT.providerOptions,
+    providerOptions: MODEL_CONFIG.REASONING_OPTIONS,
     experimental_transform: [smoothStream({ chunking: /.{1}/g })],
     stopWhen: [stepCountIs(AGENT_CONFIG.LEAD_AGENT_MAX_STEPS), hasToolCall("complete_task")],
     prepareStep: async ({ stepNumber }) => {

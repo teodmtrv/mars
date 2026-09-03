@@ -1,17 +1,17 @@
 "use client"
 
-import { Card } from "@/components/ui/card"
+import { Check, Loader2 } from "lucide-react"
+import React from "react"
+import { SubAgentToolCall } from "@/ai/types"
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger
 } from "@/components/ui/accordion"
-import { Loader2, Check } from "lucide-react"
-import React from "react"
-import { WebSearch } from "./web-search"
+import { Card } from "@/components/ui/card"
 import { WebFetch } from "./web-fetch"
-import { SubAgentToolCall } from "@/ai/types"
+import { WebSearch } from "./web-search"
 
 interface SubAgentProps {
   id: string
@@ -21,7 +21,13 @@ interface SubAgentProps {
 }
 
 export function SubAgent({ id, title, toolCalls, state }: SubAgentProps) {
-  const sourceCount = toolCalls?.filter((call) => call.toolName === "web_fetch").length || 0
+  const sourceCount = new Set(
+    toolCalls?.flatMap((call) =>
+      call.toolName === "search_web"
+        ? call.output.results.map((result) => result.url)
+        : [call.input.url]
+    )
+  ).size
 
   return (
     <Card className="p-0 w-full">
@@ -53,17 +59,17 @@ export function SubAgent({ id, title, toolCalls, state }: SubAgentProps) {
               <div className="px-4">
                 <div className="space-y-2">
                   {toolCalls.map((toolCall, index) => {
-                    if (toolCall.toolName === "web_search") {
+                    if (toolCall.toolName === "search_web") {
                       return (
                         <WebSearch
                           key={toolCall.toolCallId}
                           query={toolCall.input.query}
-                          results={toolCall.output.results || []}
+                          results={toolCall.output.results}
                           subAgentId={id}
                           searchIndex={index}
                         />
                       )
-                    } else if (toolCall.toolName === "web_fetch") {
+                    } else if (toolCall.toolName === "fetch_web") {
                       return (
                         <WebFetch
                           key={toolCall.toolCallId}

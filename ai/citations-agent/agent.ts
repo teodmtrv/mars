@@ -1,7 +1,7 @@
 import { smoothStream, streamText, UIMessageStreamWriter } from "ai"
-import { CITATIONS_AGENT_PROMPT } from "./prompt"
 import { MODEL_CONFIG } from "../config"
-import { Source, MyUIMessage } from "../types"
+import { MyUIMessage, Source } from "../types"
+import { CITATIONS_AGENT_PROMPT } from "./prompt"
 
 export async function runCitationsAgent(
   sources: Source[],
@@ -30,7 +30,7 @@ export async function runCitationsAgent(
   console.log("Adding citations...")
   // Generate complete report with citations
   const citationsResult = await streamText({
-    model: MODEL_CONFIG.CITATIONS.model,
+    model: MODEL_CONFIG.MODEL,
     system: CITATIONS_AGENT_PROMPT,
     prompt: `Here is the synthesized text and sources collected during research:
 
@@ -48,9 +48,8 @@ export async function runCitationsAgent(
     </sources>
     `,
     abortSignal,
-    temperature: MODEL_CONFIG.TEMPERATURE,
     maxOutputTokens: MODEL_CONFIG.MAX_OUTPUT_TOKENS,
-    providerOptions: MODEL_CONFIG.CITATIONS.providerOptions,
+    reasoning: MODEL_CONFIG.REASONING,
     experimental_transform: [smoothStream({ chunking: /.{1}/g })],
     onError(error) {
       console.error(error)

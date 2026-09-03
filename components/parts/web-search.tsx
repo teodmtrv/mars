@@ -1,26 +1,28 @@
 "use client"
 
-import { Card, CardContent } from "@/components/ui/card"
+import { Globe, Link } from "lucide-react"
+import React from "react"
+import { WebSearchToolResult } from "@/ai/types"
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger
 } from "@/components/ui/accordion"
-import { Globe, Link } from "lucide-react"
-import React from "react"
+import { Card, CardContent } from "@/components/ui/card"
 import { getFaviconUrl } from "@/lib/utils"
-import { SearchResult } from "exa-js"
+
+type SearchResult = WebSearchToolResult["output"]["results"][number]
 
 interface WebSearchProps {
   query: string
-  results: SearchResult<{}>[]
+  results: SearchResult[]
   subAgentId: string
   searchIndex: number
 }
 
 export function WebSearch({ query, results, subAgentId, searchIndex }: WebSearchProps) {
-  const renderSearchResult = (result: SearchResult<{}>, index: number) => {
+  const renderSearchResult = (result: SearchResult, index: number) => {
     const faviconUrl = getFaviconUrl(result.url)
 
     return (
@@ -61,9 +63,9 @@ export function WebSearch({ query, results, subAgentId, searchIndex }: WebSearch
                   {new URL(result.url).hostname}
                 </span>
               </div>
-              {result.text && (
+              {result.highlights.length > 0 && (
                 <p className="text-xs text-muted-foreground line-clamp-2 break-words">
-                  {result.text}
+                  {result.highlights.join(" ")}
                 </p>
               )}
             </div>
@@ -96,7 +98,7 @@ export function WebSearch({ query, results, subAgentId, searchIndex }: WebSearch
             <AccordionContent>
               <div className="px-0">
                 <div className="space-y-2">
-                  {results.map((result: SearchResult<{}>, index: number) =>
+                  {results.map((result: SearchResult, index: number) =>
                     renderSearchResult(result, index)
                   )}
                 </div>
