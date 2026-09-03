@@ -1,4 +1,4 @@
-import { GitFork } from "lucide-react"
+import { Github } from "lucide-react"
 import Link from "next/link"
 import ThemeToggleButton from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
@@ -17,7 +17,7 @@ export function Header() {
               rel="noopener noreferrer"
               aria-label="GitHub repository"
             >
-              <GitFork className="size-4" />
+              <Github className="size-4" />
             </Link>
           </Button>
         </div>
